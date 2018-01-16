@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ruby.h>
 
 /* MSVC compat */
 #if defined(_MSC_VER)
@@ -74,9 +75,7 @@ bufgrow(struct buf *buf, size_t neosz)
 	while (neoasz < neosz)
 		neoasz += buf->unit;
 
-	neodata = realloc(buf->data, neoasz);
-	if (!neodata)
-		return BUF_ENOMEM;
+	neodata = ruby_xrealloc(buf->data, neoasz);
 
 	buf->data = neodata;
 	buf->asize = neoasz;
@@ -89,7 +88,7 @@ struct buf *
 bufnew(size_t unit)
 {
 	struct buf *ret;
-	ret = malloc(sizeof (struct buf));
+	ret = ruby_xmalloc(sizeof (struct buf));
 
 	if (ret) {
 		ret->data = 0;
@@ -198,6 +197,6 @@ bufrelease(struct buf *buf)
 	if (!buf)
 		return;
 
-	free(buf->data);
-	free(buf);
+	ruby_xfree(buf->data);
+	ruby_xfree(buf);
 }
